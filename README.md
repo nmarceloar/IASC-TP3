@@ -1,2 +1,20 @@
-# IASC-TP3
-Trabajo Práctico IRC
+# Tp3
+
+**TODO: Add description**
+
+## Installation
+
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+
+  1. Add tp3 to your list of dependencies in `mix.exs`:
+
+        def deps do
+          [{:tp3, "~> 0.0.1"}]
+        end
+
+  2. Ensure tp3 is started before your application:
+
+        def application do
+          [applications: [:tp3]]
+        end
+
