@@ -31,6 +31,10 @@ defmodule ChatServer do
 				send sender_id, {:unicast_received, self(), localid}
 				loop(msgid, messages, clients)
 
+			{:message_started, sender, destination } -> 
+				send(destination, {:message_started, self(), sender})
+				loop(msgid, messages, clients)
+
 			{:unicast_read, sender, global_id} ->
 				{sender_id, localid, msg} = Map.get(messages, global_id)
 				send sender_id, {:unicast_read, self(), localid}
@@ -47,6 +51,8 @@ defmodule ChatServer do
 			{:dump_clients} -> 
 				Enum.each(Map.keys(clients), fn c -> IO.puts(inspect c) end)
 				loop(msgid, messages, clients)
+
+
 
 			{:dump_silenced} -> 
 				Enum.each(clients, fn s -> IO.puts(inspect s) end)
@@ -99,7 +105,13 @@ defmodule ChatClient do
 				Map.values(messages) |> Enum.each(fn msg -> IO.puts(inspect msg) end)
 				loop(server, messages, localid)
 
+			{:message_started, ^server, sender} -> 
+				IO.puts("#{inspect self} received notification: -- Client: #{inspect sender} started writing a message --")
+				loop(server, messages, localid)
+
 			{:send_unicast, destination, msg} -> 
+				send(server, {:message_started, self(), destination})
+				:timer.sleep(random(300,500))
 				IO.puts("#{inspect self} sent unicast message with localid: #{localid+1}")
 				send(server, {:unicast, self(), destination, {localid + 1, msg}})
 				loop(server, Map.put(messages, localid+1, {msg, false, false}), localid + 1)
@@ -121,7 +133,7 @@ defmodule ChatClient do
 			{:new_unicast, ^server, {msg_id, msg}} -> 
 				IO.puts "#{inspect self} received new unicast msg --> #{msg}"
 				send(server, {:unicast_received, self(), msg_id})
-				:timer.send_after(randomdelay(), self(), {:read_unicast, msg_id})
+				:timer.send_after(random(2000,3000), self(), {:read_unicast, msg_id})
 				loop(server, messages, localid)
 
 			{:new_broadcast, ^server, msg} -> 
@@ -136,13 +148,8 @@ defmodule ChatClient do
 
 	end
 
-
 	def random(min,max) do
 		Kernel.trunc(min + Float.floor(:random.uniform * (max - min)))
-	end
-
-	def randomdelay() do
-		random(3000,5000)
 	end
 
 	def send_unicast(client, destination, msg) do
@@ -191,11 +198,7 @@ ChatServer.silenced(s)
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-# c2 deberia recibir los unicast de c1
-
-ChatClient.send_unicast(c1, c2, "unicast from c1 to c2")
-
-# c2 y c3 no deberian ver los broadcasts de c1 despues de ser silenciados para c1
+# c2 y c3 no deberian ver los broadcasts de c1 despues de ser silenciados por c1
 
 ChatClient.silence(c1, c2)
 ChatClient.silence(c1, c3)
@@ -204,15 +207,25 @@ ChatServer.silenced(s)
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-# c2 y c3 deberian ver nuevamente los broadcasts de c1 luego de ser activados nuevamente
+# c2 y c3 deberian ver nuevamente los broadcasts de c1 luego de ser re-activados por c1
 
 ChatClient.unsilence(c1, c2)
 ChatClient.unsilence(c1, c3)
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-# c3, c4, y c5 deberian recibir los unicast de c1 confirmado recepcion y lectura por separado
+# c2, c3, c4, y c5 deberian recibir los unicast de c1 confirmado recepcion y lectura por separado
 
+ChatClient.send_unicast(c1, c2, "unicast from c1 to c2")
 ChatClient.send_unicast(c1, c3, "unicast from c1 to c3")
 ChatClient.send_unicast(c1, c4, "unicast from c1 to c4")
 ChatClient.send_unicast(c1, c5, "unicast from c1 to c5")
+
+# c1 deberia tener 4 mensajes unicast con confirmacion de recepcion y lectura 
+
+:timer.sleep(5000)
+ChatClient.messages(c1)
+
+
+
+

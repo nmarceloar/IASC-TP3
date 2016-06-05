@@ -1,20 +1,9 @@
-# Tp3
+# IASC - TP3
 
-**TODO: Add description**
 
-## Installation
+[Enunciado TP3](https://docs.google.com/document/d/1KiFR3stOFVJqpOnEU9NCCyhONzbkD8aBWRjRbnax_Us/edit)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+Probar con:
 
-  1. Add tp3 to your list of dependencies in `mix.exs`:
-
-        def deps do
-          [{:tp3, "~> 0.0.1"}]
-        end
-
-  2. Ensure tp3 is started before your application:
-
-        def application do
-          [applications: [:tp3]]
-        end
+	iex lib/tp3-iteraciones.exs
 
