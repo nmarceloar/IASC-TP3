@@ -169,7 +169,7 @@ end
 
 
 
-" ---- TESTs (si se les puede llamar tests) ----- "
+# ---- TESTs (si se les puede llamar tests) -----
 
 s = ChatServer.new 
 
@@ -179,23 +179,23 @@ c3 = ChatClient.new(s)
 c4 = ChatClient.new(s)
 c5 = ChatClient.new(s)
 
-"server deberia conocer a los 5 clientes"
+# server deberia conocer a los 5 clientes
 
 ChatServer.clients(s)
 
-"server no deberia tener ningun cliente silenciado"
+# server no deberia tener ningun cliente silenciado
 
 ChatServer.silenced(s)
 
-"c2, c3, c4, y c5 deberian recibir los broadcasts de c1"
+# c2, c3, c4, y c5 deberian recibir los broadcasts de c1
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-"c2 deberia recibir los unicast de c1"
+# c2 deberia recibir los unicast de c1
 
 ChatClient.send_unicast(c1, c2, "unicast from c1 to c2")
 
-"c2 y c3 no deberian ver los broadcasts de c1 despues de ser silenciados para c1"
+# c2 y c3 no deberian ver los broadcasts de c1 despues de ser silenciados para c1
 
 ChatClient.silence(c1, c2)
 ChatClient.silence(c1, c3)
@@ -204,14 +204,14 @@ ChatServer.silenced(s)
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-"c2 y c3 deberian ver nuevamente los broadcasts de c1 luego de ser activados nuevamente"
+# c2 y c3 deberian ver nuevamente los broadcasts de c1 luego de ser activados nuevamente
 
 ChatClient.unsilence(c1, c2)
 ChatClient.unsilence(c1, c3)
 
 ChatClient.send_broadcast(c1, "broadcast from c1")
 
-"c3, c4, y c5 deberian recibir los unicast de c1 confirmado recepcion y lectura por separado"
+# c3, c4, y c5 deberian recibir los unicast de c1 confirmado recepcion y lectura por separado
 
 ChatClient.send_unicast(c1, c3, "unicast from c1 to c3")
 ChatClient.send_unicast(c1, c4, "unicast from c1 to c4")
